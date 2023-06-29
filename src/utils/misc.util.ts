@@ -12,6 +12,10 @@ export class MiscUtil {
     return bcrypt.hash(data, 10);
   }
 
+  decrytData(data: string, encrypted: string) {
+    return bcrypt.compare(data, encrypted);
+  }
+
   async getTokens(userId: number, email: string): Promise<Tokens> {
     const [accessToken, refreshToken] = await Promise.all([
       await this.jwtService.signAsync(

@@ -13,20 +13,17 @@ export class AuthController {
   }
 
   @Post('login')
-  async login() {
-    this.authService.login();
-    return 'login';
+  async login(@Body() user: AuthDto): Promise<Tokens> {
+    return this.authService.login(user);
   }
 
   @Post('logout')
   async logout() {
-    this.authService.logout();
-    return 'logout';
+    return this.authService.logout();
   }
 
   @Post('refresh')
   async refreshToken() {
-    this.authService.refreshToken();
-    return 'refresh';
+    return this.authService.refreshToken();
   }
 }

@@ -1,15 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from './../prisma/prisma.service';
 import { AuthDto } from './dto/auth.dto';
-import { hashData } from '../utils/misc.util';
+import { MiscUtil } from '../utils/misc.util';
 import { Tokens } from './types';
 
 @Injectable()
 export class AuthService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService, private miscUtil: MiscUtil) {}
 
   async signup(authData: AuthDto): Promise<Tokens> {
-    const hashPassword = await hashData(authData.password);
+    const hashPassword = await MiscUtil.hashData(authData.password);
 
     const user = await this.prisma.user.create({
       data: {
@@ -17,7 +17,9 @@ export class AuthService {
         hash: hashPassword,
       },
     });
-    return 'signup';
+    const tokens = await this.miscUtil.getTokens(user.id, user.email);
+    await this.miscUtil.updateRtHash(user.id, tokens.refresh_token);
+    return tokens;
   }
 
   async login() {

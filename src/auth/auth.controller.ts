@@ -9,8 +9,7 @@ export class AuthController {
 
   @Post('signup')
   async signup(@Body() user: AuthDto): Promise<Tokens> {
-    this.authService.signup(user);
-    return 'signup';
+    return this.authService.signup(user);
   }
 
   @Post('login')

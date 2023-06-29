@@ -16,6 +16,12 @@ export class MiscUtil {
     return bcrypt.compare(data, encrypted);
   }
 
+  verifyToken(token: string) {
+    return this.jwtService.verifyAsync(token, {
+      secret: process.env.AT_SECRET,
+    });
+  }
+
   async getTokens(userId: number, email: string): Promise<Tokens> {
     const [accessToken, refreshToken] = await Promise.all([
       await this.jwtService.signAsync(

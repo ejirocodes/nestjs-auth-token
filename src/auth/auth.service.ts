@@ -64,13 +64,12 @@ export class AuthService {
   }
 
   async refreshToken(userId: number, refreshToken: string) {
-    console.log('refreshToken', refreshToken, 'userId', userId);
     const user = await this.prisma.user.findUnique({
       where: {
         id: userId,
       },
     });
-    if (!user) {
+    if (!user || !user.hashRt) {
       throw new NotFoundException('User not found');
     }
 

@@ -7,6 +7,7 @@ import { PrismaService } from './../prisma/prisma.service';
 import { AuthDto } from './dto/auth.dto';
 import { MiscUtil } from '../utils/misc.util';
 import { Tokens } from './types';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
@@ -42,7 +43,7 @@ export class AuthService {
     if (!isPasswordValid) {
       throw new ForbiddenException('Invalid password');
     }
-    const tokens = await this.miscUtil.getTokens(user.id, user.hashRt);
+    const tokens = await this.miscUtil.getTokens(user.id, user.email);
     await this.miscUtil.updateRtHash(user.id, tokens.refresh_token);
 
     return tokens;
@@ -62,7 +63,20 @@ export class AuthService {
     });
   }
 
-  async refreshToken() {
-    return 'refresh';
+  async refreshToken(userId: number, refreshToken: string) {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+    });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    const refreshTokenMatches = await bcrypt.compare(refreshToken, user.hashRt);
+    if (!refreshTokenMatches) {
+      throw new ForbiddenException('Invalid refresh token');
+    }
+    const tokens = await this.miscUtil.getTokens(user.id, user.email);
+    await this.miscUtil.updateRtHash(user.id, tokens.refresh_token);
   }
 }

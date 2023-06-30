@@ -32,16 +32,18 @@ export class AuthController {
   @UseGuards(AuthGuard('jwt'))
   @Post('logout')
   @HttpCode(HttpStatus.OK)
-  async logout(@Req() req: Request & { user: { id: number } }) {
+  async logout(@Req() req: Request & { user: { sub: number } }) {
     const user = req.user;
-    console.log({ user });
-    return this.authService.logout(user.id);
+    return this.authService.logout(user.sub);
   }
 
   @UseGuards(AuthGuard('jwt-refresh'))
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
-  async refreshToken() {
-    return this.authService.refreshToken();
+  async refreshToken(
+    @Req() req: Request & { user: { sub: number; refreshToken: string } },
+  ) {
+    const user = req.user;
+    return this.authService.refreshToken(user.sub, user.refreshToken);
   }
 }

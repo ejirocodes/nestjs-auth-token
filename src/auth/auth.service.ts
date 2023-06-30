@@ -64,6 +64,7 @@ export class AuthService {
   }
 
   async refreshToken(userId: number, refreshToken: string) {
+    console.log('refreshToken', refreshToken, 'userId', userId);
     const user = await this.prisma.user.findUnique({
       where: {
         id: userId,
@@ -72,6 +73,7 @@ export class AuthService {
     if (!user) {
       throw new NotFoundException('User not found');
     }
+
     const refreshTokenMatches = await bcrypt.compare(refreshToken, user.hashRt);
     if (!refreshTokenMatches) {
       throw new ForbiddenException('Invalid refresh token');

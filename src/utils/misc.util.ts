@@ -23,7 +23,7 @@ export class MiscUtil {
   }
 
   async getTokens(userId: number, email: string): Promise<Tokens> {
-    const [accessToken, refreshToken] = await Promise.all([
+    const [access_token, refresh_token] = await Promise.all([
       await this.jwtService.signAsync(
         {
           sub: userId,
@@ -46,13 +46,13 @@ export class MiscUtil {
       ),
     ]);
     return {
-      access_token: accessToken,
-      refresh_token: refreshToken,
+      access_token,
+      refresh_token,
     };
   }
 
-  async updateRtHash(id: number, refreshToken: string) {
-    const hashRt = await MiscUtil.hashData(refreshToken);
+  async updateRtHash(id: number, refresh_token: string) {
+    const hashRt = await MiscUtil.hashData(refresh_token);
     return this.prisma.user.update({
       where: {
         id,
